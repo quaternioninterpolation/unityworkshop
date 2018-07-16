@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class AIEntity : BaseEntity
 {
-    public float thinkTime = 0.1f;
+    public float thinkTime = 1f;
 
     protected Timer thinkTimer;
 
     protected override void Awake()
     {
         base.Awake();
-        thinkTimer = new Timer();
+        thinkTimer = new Timer(thinkTime);
         thinkTimer.SetElapsedCallback(Think);
     }
 

@@ -99,5 +99,6 @@ MonoBehaviour:
   followTarget: {fileID: 0}
   followX: 0
   followY: 1
-  smoothTime: 0.3
-  maxSpeed: 20
+  followOffset: {x: 0, y: -3.2}
+  smoothTime: 0.1
+  maxSpeed: 200

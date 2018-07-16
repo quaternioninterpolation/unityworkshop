@@ -2,14 +2,14 @@
 using System.Collections;
 
 [System.Serializable]
-public class Weapon
+public class Weapon : MonoBehaviour
 {
     public Transform projectilePrefab;
     public float nextShootDelay;
 
     protected Timer shootTimer;
 
-    public Weapon()
+    protected virtual void Awake()
     {
         shootTimer = new Timer(nextShootDelay);
     }
@@ -24,18 +24,18 @@ public class Weapon
         shootTimer.Update(Time.deltaTime);
     }
 
-    public virtual void Fire(BaseEntity owner, Vector3 position, Vector2 direction)
+    public virtual void Fire(BaseEntity owner, Vector2 direction, float inheritedSpeed)
     {
         if (CanFire())
         {
             shootTimer.Reset();
 
-            Transform projectileInstance = GameObject.Instantiate(projectilePrefab, position, Quaternion.identity);
+            Transform projectileInstance = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
 
             Projectile projectile = projectileInstance.GetComponent<Projectile>();
             if (projectile != null)
             {
-                projectile.SetData(owner, direction);
+                projectile.SetData(owner, direction, inheritedSpeed);
             }
         }
     }

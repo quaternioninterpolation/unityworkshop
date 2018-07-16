@@ -40,12 +40,19 @@ public abstract class BaseEntity : MonoBehaviour {
         Reset();
     }
 
+    public void Kill()
+    {
+        health = 0;
+    }
+
     protected virtual void OnDeath()
     {
         if (spawnOnDeath != null)
         {
             Instantiate(spawnOnDeath, transform.position, Quaternion.identity);
         }
+
+        Destroy(gameObject);
     }
 
     //TODO: Pass through type of damage, or the entity responsible for the damage.

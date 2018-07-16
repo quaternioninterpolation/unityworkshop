@@ -6,6 +6,7 @@ public class FollowCamera : MonoBehaviour
     public Transform followTarget;
     public bool followX;
     public bool followY;
+    public Vector2 followOffset = new Vector2(0f, -50f);
 
     public float smoothTime = 0.3f;
     public float maxSpeed = 20f;
@@ -17,7 +18,8 @@ public class FollowCamera : MonoBehaviour
     {
         if (followTarget != null)
         {
-            Vector2 movePos = Vector2.SmoothDamp(transform.position, followTarget.transform.position, ref velocity, smoothTime, maxSpeed, Time.deltaTime);
+            Vector2 offsetTarget = new Vector2(followTarget.transform.position.x, followTarget.transform.position.y) - followOffset;
+            Vector2 movePos = Vector2.SmoothDamp(transform.position, offsetTarget, ref velocity, smoothTime, maxSpeed, Time.deltaTime);
             if (!followX) movePos.x = transform.position.x;
             if (!followY) movePos.y = transform.position.y;
 

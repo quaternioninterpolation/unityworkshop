@@ -38,15 +38,15 @@ public class Timer
 
     public void Reset()
     {
-        timer = targetTime;
+        timer = 0f;
     }
 
     public void Update(float time)
     {
-        if (timer > 0)
+        if (timer < targetTime)
         {
-            timer -= Mathf.Max(0, time);
-            if (timer == 0)
+            timer = Mathf.Min(timer+time, targetTime);
+            if (timer >= targetTime)
             {
                 callback?.Invoke();
             }
@@ -55,6 +55,16 @@ public class Timer
 
     public bool IsElapsed()
     {
-        return timer <= 0;
+        return timer >= targetTime;
+    }
+
+    public float GetTime()
+    {
+        return timer;
+    }
+
+    public float GetTimeRatio()
+    {
+        return targetTime != 0f ? timer / targetTime : 1f;
     }
 }

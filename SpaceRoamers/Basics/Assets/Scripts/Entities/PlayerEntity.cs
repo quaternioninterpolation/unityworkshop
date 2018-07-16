@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class PlayerEntity : BaseEntity
 {
-    public float maxVelocity = 5f;
-    public float accelerationX = 10f;
-    public float accelerationY = 2f;
-    public float idleDrag = 15f;
+    public Vector2 maxVelocity = new Vector2(5f, 5f);
+    public Vector2 acceleration = new Vector2(10f, 4f);
+    public Vector2 dragMultiplier = new Vector2(6f, 3f);
+
     public Weapon baseWeapon;
 
     protected Rigidbody2D rb;
+
+    public Vector2 velocity;
+    public Vector2 targetVelocity;
 
     protected override void Awake()
     {
@@ -19,67 +22,55 @@ public class PlayerEntity : BaseEntity
         team = 1;
     }
 
-    /// <summary>
-    /// Updates at a regular interval before physics is calculated
-    /// </summary>
-    protected void FixedUpdate()
+    protected void ProcessMovementDirection(bool isPressed, Vector2 direction, ref Vector2 output)
     {
-        Vector2 movement = new Vector2();
-
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        bool isX = Mathf.Abs(direction.x) > Mathf.Abs(direction.y);
+        if (isPressed)
         {
-            movement += Vector2.left * accelerationX;
+            output += direction * acceleration;
         }
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-        {
-            movement += Vector2.right * accelerationX;
-        }
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-        {
-            movement += Vector2.up * accelerationY;
-        }
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-        {
-            movement += Vector2.down * accelerationY;
-        }
-
-        //Limit our velocity to maximum
-        if (movement.sqrMagnitude > 0f)
-        {
-            rb.AddForce(movement * Time.deltaTime);
-            if (rb.velocity.sqrMagnitude > maxVelocity * maxVelocity)
-            {
-                rb.velocity = rb.velocity.normalized * maxVelocity;
-            }
-        }
-        else
-        {
-            //Add drag
-            //Drag = velocity - idleDrag * deltaTime
-            float velocityMag = rb.velocity.magnitude;
-            if (velocityMag > 0f)
-            {
-                velocityMag = Mathf.Max(velocityMag - idleDrag * Time.deltaTime, 0f);
-                rb.velocity = rb.velocity.normalized * velocityMag;
-            }
-        }
-
     }
 
     /// <summary>
-    /// Updates every frame
+    /// Updates at a regular interval before physics is calculated
     /// </summary>
-    protected virtual void Update()
+    protected void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
+        targetVelocity.Set(0f,0f);
+
+        ProcessMovementDirection(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow), Vector2.left, ref targetVelocity);
+        ProcessMovementDirection(Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightAlt), Vector2.right, ref targetVelocity);
+        ProcessMovementDirection(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow), Vector2.up, ref targetVelocity);
+        ProcessMovementDirection(Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow), Vector2.down, ref targetVelocity);
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             FirePrimary();
         }
     }
 
+    protected virtual void FixedUpdate()
+    {
+        velocity += targetVelocity * Time.fixedTime;
+        
+        if (Mathf.Abs(targetVelocity.x) == 0f)
+        {
+            velocity.x = Mathf.Lerp(velocity.x, 0f, Time.deltaTime * dragMultiplier.x);
+        }
+        if (Mathf.Abs(targetVelocity.y) == 0f)
+        {
+            velocity.y = Mathf.Lerp(velocity.y, 0f, Time.deltaTime * dragMultiplier.y);
+        }
+
+        velocity.x = Mathf.Clamp(velocity.x, -maxVelocity.x, maxVelocity.x);
+        velocity.y = Mathf.Clamp(velocity.y, -maxVelocity.y, maxVelocity.y);
+
+        rb.velocity = velocity;
+    }
+
     protected virtual void FirePrimary()
     {
         //TODO: If we have pickup weapons, fire them first
-        baseWeapon.Fire(this, transform.position, Vector3.up);
+        baseWeapon.Fire(this, Vector3.up, rb.velocity.y);
     }
 }

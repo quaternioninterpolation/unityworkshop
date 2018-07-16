@@ -5,8 +5,9 @@ using UnityEngine;
 public abstract class BaseEntity : MonoBehaviour {
     public int maxHealth = 10;
     public int team;
-    public Transform spawnOnDeath;
+    public Transform[] spawnOnDeath;
 
+    protected System.Action destroyCallback;
     protected int _health;
     public int health
     {
@@ -23,6 +24,11 @@ public abstract class BaseEntity : MonoBehaviour {
         {
             return _health;
         }
+    }
+
+    public void SetDestroyCallback(System.Action callback)
+    {
+        this.destroyCallback = callback;
     }
 
     protected virtual void Awake()
@@ -47,17 +53,26 @@ public abstract class BaseEntity : MonoBehaviour {
 
     protected virtual void OnDeath()
     {
-        if (spawnOnDeath != null)
+        if (spawnOnDeath != null && spawnOnDeath.Length > 0)
         {
-            Instantiate(spawnOnDeath, transform.position, Quaternion.identity);
+            foreach(var prefab in spawnOnDeath)
+            {
+                Instantiate(prefab, transform.position, Quaternion.identity);
+            }
         }
 
+        destroyCallback?.Invoke();
         Destroy(gameObject);
     }
 
     //TODO: Pass through type of damage, or the entity responsible for the damage.
-    public void Damage(int damageAmount)
+    public virtual void Damage(int damageAmount)
     {
         health -= damageAmount;
+    }
+
+    public virtual bool IsAlive()
+    {
+        return health > 0;
     }
 }

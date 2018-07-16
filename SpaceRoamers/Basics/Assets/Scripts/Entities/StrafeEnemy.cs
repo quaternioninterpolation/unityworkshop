@@ -57,7 +57,10 @@ public class StrafeEnemy : EnemyShip
                 shootDirection = (enemy.transform.position - transform.position);
             }
 
-            baseWeapon.Fire(this, shootDirection, 0f);
+            if (baseWeapon != null)
+            {
+                baseWeapon.Fire(this, shootDirection, 0f);
+            }
 
             //Set our next think/fire time
             SetThinkTime(Random.Range(shootDelayRange.x, shootDelayRange.y));

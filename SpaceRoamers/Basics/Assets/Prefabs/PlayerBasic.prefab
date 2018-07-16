@@ -54,7 +54,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1822540806394194}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.01, y: -3.27, z: 0}
+  m_LocalPosition: {x: -0.3, y: -6.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4506773822569386}
@@ -136,8 +136,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 10
   team: 1
-  spawnOnDeath: {fileID: 4806319126139950, guid: 8f991bb367eb14d46aeae393e5a4c752,
-    type: 2}
+  spawnOnDeath:
+  - {fileID: 4806319126139950, guid: 8f991bb367eb14d46aeae393e5a4c752, type: 2}
   maxVelocity: {x: 5, y: 5}
   acceleration: {x: 10, y: 4}
   dragMultiplier: {x: 6, y: 3}

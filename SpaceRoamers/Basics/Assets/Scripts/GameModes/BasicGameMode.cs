@@ -4,10 +4,12 @@ using UnityEngine.SceneManagement;
 
 public class BasicGameMode : GameModeBase<BasicGameMode>
 {
+    public FollowCamera camera;
     public FinishLevelArea finishLevelArea;
     public SpawnPosition spawnPosition;
     public string nextLevelName;
     public int score;
+    public float respawnTime = 2f;
 
     public Transform playerPrefab;
 
@@ -18,6 +20,7 @@ public class BasicGameMode : GameModeBase<BasicGameMode>
         base.Awake();
 
         finishLevelArea.SetCallback((entity) => OnLevelFinished());
+        RespawnPlayer();
     }
 
     public override void Reset()
@@ -32,9 +35,16 @@ public class BasicGameMode : GameModeBase<BasicGameMode>
 
     public void RespawnPlayer()
     {
-        if (player == null)
-        {
-            //
-        }
+        StartCoroutine(RespawnCoroutine());
+    }
+
+    protected IEnumerator RespawnCoroutine()
+    {
+        yield return new WaitForSeconds(respawnTime);
+        //Spawn new player
+        Transform playerInstance = Instantiate(playerPrefab, spawnPosition.transform.position, Quaternion.identity);
+        player = playerInstance.GetComponent<PlayerEntity>();
+        player.SetDestroyCallback(RespawnPlayer);
+        camera.SetTarget(playerInstance.transform);
     }
 }
